@@ -43,10 +43,13 @@
         var mymap = L.map('mapid', {
             fullscreenControl: true
         }).setView(minneapolis, 16);
-        
+
         L.control.locate().addTo(mymap);
 
-        var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        // Uncomment the following line for default OSM tiles:
+        // var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        // Uncomment the following line for OSM 'Humanitarian' tiles:
+        var osmUrl = 'http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png ';
         var osmAttrib = 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
         L.tileLayer(
             osmUrl, {
