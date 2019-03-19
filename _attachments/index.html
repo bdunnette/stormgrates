@@ -4,11 +4,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="
-        crossorigin="" />
-    <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js" integrity="sha512-QVftwZFqvtRNi0ZyCtsznlKSWOStnDORoefr1enyq5mVL4tmKB3S/EnC3rRJcxCPavG10IcrVGSmPh6Qw5lwrg=="
-        crossorigin=""></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.css" integrity="sha256-YR4HrDE479EpYZgeTkQfgVJq08+277UXxMLbi/YP69o="
+        crossorigin="anonymous" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet.fullscreen/1.4.5/Control.FullScreen.css"
+        integrity="sha256-RTALnHN76PJ32RJx2mxggy+RUt9TIRV+mfPLSLbI75A=" crossorigin="anonymous" />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.66.2/L.Control.Locate.min.css"
+        integrity="sha256-R0kRcMGbf3R8oqbI7L+q9hJQzjRs0ZxUo4dnLBHtnpQ=" crossorigin="anonymous" />
+    <link href='//api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/leaflet.fullscreen.css' rel='stylesheet' />
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"
+        integrity="sha256-eZrrJcwDc/3uDhsdt61sL2oOBY362qM3lon1gyExkL0=" crossorigin="anonymous" />
+    <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet/1.4.0/leaflet.js" integrity="sha256-6BZRSENq3kxI4YYBDqJ23xg0r1GwTHEpvp3okdaIqBw="
+        crossorigin="anonymous"></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.min.js" integrity="sha256-FgpCb/KJQlLNfOu91ta32o/NMZxltwRo8QtmkMRdAu8="
+        crossorigin="anonymous"></script>
+    <script src='//api.mapbox.com/mapbox.js/plugins/leaflet-fullscreen/v1.0.1/Leaflet.fullscreen.min.js'></script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/leaflet-locatecontrol/0.66.2/L.Control.Locate.min.js" integrity="sha256-/bmhGFypHRUcapf5lNMzz72ZkLCieTXsYar7R98dQJg="
         crossorigin="anonymous"></script>
     <style>
         body {
@@ -29,7 +39,12 @@
 <body>
     <div id="mapid"></div>
     <script>
-        var mymap = L.map('mapid').setView([44.9778, -93.2650], 16);
+        var minneapolis = [44.9778, -93.2650]
+        var mymap = L.map('mapid', {
+            fullscreenControl: true
+        }).setView(minneapolis, 16);
+        
+        L.control.locate().addTo(mymap);
 
         var osmUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
         var osmAttrib = 'Map data © <a href="https://openstreetmap.org">OpenStreetMap</a> contributors';
@@ -45,6 +60,8 @@
             var bounds = mymap.getBounds();
             var ne = bounds._northEast
             var sw = bounds._southWest
+            // Per: https://www.slideshare.net/dashDB/couchdb-day-nyc-2017-using-geospatial-data-in-cloudant-couchdb
+            // Cloudant bounding boxes use the following format: bbox=minlon,minlat,maxlon,maxlat
             var bbox = [sw.lng, sw.lat, ne.lng, ne.lat]
             $.getJSON(
                 "/mpls-grates/_design/geodd/_geo/geoidx?bbox=" + bbox,
@@ -57,28 +74,14 @@
         }
 
         $(document).ready(function () {
-            mymap.locate({
-                setView: true,
-                maxZoom: 18
-            });
+            // mymap.locate({
+            //     setView: true,
+            //     maxZoom: 18
+            // });
             getMarkers();
         });
 
         mymap.on('moveend', getMarkers);
-
-        function onLocationFound(e) {
-            console.log("location found")
-            console.log(e)
-        }
-
-        mymap.on('locationfound', onLocationFound);
-
-        function onLocationError(e) {
-            console.log("location error")
-            console.error(e);
-        }
-
-        mymap.on('locationerror', onLocationError);
     </script>
 
 </body>
